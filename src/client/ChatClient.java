@@ -15,29 +15,43 @@ public class ChatClient {
             Socket socket = new Socket("localhost", Constants.PORT);
             System.out.println("Connected to server!");
 
-            BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
-            BufferedReader serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in)); //to use to get input from user
+            BufferedReader serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream())); //to read msg from server
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true); //to send message to server
 
-            String userInput, response;
+            //thread to receive messages
+            Thread receiveThread = new Thread(() -> {
+                try {
+                    
+                    String serverMessage;
+
+                    while((serverMessage = serverReader.readLine()) != null){
+
+                        System.out.println(serverMessage);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+            receiveThread.start();
+
+            //sending messages
+            String userInput;
 
             while(true){
 
-                System.out.print("You: ");
                 userInput = consoleReader.readLine();
 
                 writer.println(userInput);
 
-                if(userInput.equalsIgnoreCase("exit")){
-                    System.out.println("Disconnected from server!");
+                if(userInput.equalsIgnoreCase("exit")){ //exit condition
                     break;
                 }
-
-                response = serverReader.readLine();
-                System.out.println("Server: " + response);
             }
 
             socket.close();
+            
         } catch (Exception e) {
             e.printStackTrace();
         }

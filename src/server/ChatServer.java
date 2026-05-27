@@ -1,13 +1,14 @@
 package server;
 
 import common.Constants;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ChatServer {
+
+    //list of all connected clients
+    public static ArrayList<ClientHandler> clients = new ArrayList<>();
 
     public void startServer() {
         
@@ -16,25 +17,17 @@ public class ChatServer {
             ServerSocket serverSocket = new ServerSocket(Constants.PORT);
             System.out.println("Server is listening on port: " + Constants.PORT);
 
-            Socket socket = serverSocket.accept(); //program waits here till client tries to connect
-            System.out.println("Client connected!");
+            while(true) {
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); //to read msg from client
-            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true); //to send msg to client
+                Socket socket = serverSocket.accept(); //program waits here till client tries to connect
+                System.out.println("New client connected!");
 
-            String message;
+                ClientHandler clientHandler = new ClientHandler(socket);
+                clients.add(clientHandler);
 
-            while((message = reader.readLine()) != null){
-                System.out.println("Client: " + message);
-                if(message.equalsIgnoreCase("exit")){
-                    System.out.println("Client disconnected.");
-                    break;
-                }
-                writer.println("Message received.");
+                clientHandler.start();
             }
-
-            socket.close();
-            serverSocket.close();
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
