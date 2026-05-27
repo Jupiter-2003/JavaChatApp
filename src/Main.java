@@ -1,4 +1,3 @@
-import client.ChatClient;
 import server.ChatServer;
 
 public class Main {
@@ -7,8 +6,5 @@ public class Main {
 
         ChatServer server = new ChatServer();
         server.startServer();
-
-        ChatClient client = new ChatClient();
-        client.connect();
     }
 }
