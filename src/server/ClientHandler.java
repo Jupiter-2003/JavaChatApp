@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ClientHandler extends Thread{ //every client runs its own thread
     
@@ -12,6 +13,7 @@ public class ClientHandler extends Thread{ //every client runs its own thread
     private PrintWriter writer;
 
     private String username;
+    private String currentRoom;
 
     public ClientHandler(Socket socket){
 
@@ -28,10 +30,16 @@ public class ClientHandler extends Thread{ //every client runs its own thread
             //receiving username
             username = reader.readLine();
 
+            //default room
+            currentRoom = "general";
+
+            //adding user to general room
+            ChatServer.rooms.get(currentRoom).add(this);
+
             System.out.println(username + " connected.");
 
             //notifying everyone
-            broadcastMessage("SYSTEM: "+username+" joined the chat!");
+            broadcastToRoom("SYSTEM: "+username+" joined "+currentRoom, currentRoom);
 
         } catch (Exception e) {
             e.printStackTrace();;
@@ -51,7 +59,9 @@ public class ClientHandler extends Thread{ //every client runs its own thread
                 if(message.equalsIgnoreCase("/exit")){
 
                     ChatServer.clients.remove(this);
-                    broadcastMessage("SYSTEM: "+username+" has left the chat.");
+                    ChatServer.rooms.get(currentRoom).remove(this);
+
+                    broadcastToRoom("SYSTEM: "+username+" left the room.", currentRoom);
                     socket.close();
                     break;
                 }
@@ -60,10 +70,10 @@ public class ClientHandler extends Thread{ //every client runs its own thread
                 if(message.startsWith("/")){
                     handleCommand(message);
                 }
-                else{
+                else{ //normal message
 
-                    System.out.println(username + ": " + message);
-                    broadcastMessage(username + ": " + message);
+                    System.out.println("[" + currentRoom + "] " + username + ": " + message);
+                    broadcastToRoom("[" + currentRoom + "] " + username + ": " + message, currentRoom);
                 }
             }
         } catch (Exception e) {
@@ -82,6 +92,9 @@ public class ClientHandler extends Thread{ //every client runs its own thread
                 /help
                 /list
                 /whisper <username> <message>
+                /join <room>
+                /rooms
+                /room
                 /exit
                     """);
         
@@ -96,7 +109,36 @@ public class ClientHandler extends Thread{ //every client runs its own thread
             }
         }
 
-        //wisper
+        //rooms
+        else if(message.equalsIgnoreCase("/rooms")){
+
+            writer.println("Available rooms: ");
+            for(String room : ChatServer.rooms.keySet()){
+                writer.println(room);
+            }
+        }
+
+        //room
+        else if(message.equalsIgnoreCase("/room")){
+
+            writer.println("Current room: " + currentRoom);
+        }
+
+        //join
+        else if(message.startsWith("/join")){
+            String parts[] = message.split(" ", 2);
+
+            if(parts.length<2){
+                writer.println("Usage: /join <room>");
+                return;
+            }
+
+            String newRoom = parts[1];
+
+            joinRoom(newRoom);
+        }
+
+        //whisper
         else if(message.startsWith("/whisper")){
 
             String parts[] = message.split(" ");
@@ -116,9 +158,31 @@ public class ClientHandler extends Thread{ //every client runs its own thread
             sendPvtMsg(targetUsername, privateMessage);
         }
 
-        //Unkown command
+        //Unknown command
         else
             writer.println("Unknown command!");
+    }
+
+    //to join a room
+    public void joinRoom(String newRoom){
+
+        //removing from old room
+        ChatServer.rooms.get(currentRoom).remove(this);
+
+        //creating room if absent
+        if(!ChatServer.rooms.containsKey(newRoom)){
+            ChatServer.rooms.put(newRoom, new ArrayList<>());
+        }
+
+        //changing room
+        currentRoom = newRoom;
+
+        //adding to new room
+        ChatServer.rooms.get(currentRoom).add(this);
+
+        writer.println("Joined room: " + currentRoom);
+
+        broadcastToRoom("SYSTEM: " + username + " joined the room.", currentRoom);
     }
 
     //private messaging
@@ -138,17 +202,18 @@ public class ClientHandler extends Thread{ //every client runs its own thread
             writer.println("User not found.");
     }
 
+    //room broadcast
+    public void broadcastToRoom(String message, String room){
 
-    //to broadcast message to all clients
-    public void broadcastMessage(String message){
+        ArrayList<ClientHandler> roomClients = ChatServer.rooms.get(room);
 
-        for(ClientHandler client : ChatServer.clients) {
+        for(ClientHandler client : roomClients) {
             if(client != this)
                 client.writer.println(message); //prints message on the other clients' terminal
         }
     }
 
-    //getting username as username is private
+    //getting username as it is private
     public String getUsername(){
         return username;
     }

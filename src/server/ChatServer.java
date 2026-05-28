@@ -4,15 +4,24 @@ import common.Constants;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ChatServer {
 
     //list of all connected clients
     public static ArrayList<ClientHandler> clients = new ArrayList<>();
 
+    //rooms
+    public static HashMap<String, ArrayList<ClientHandler>> rooms = new HashMap<>();
+
+
+
     public void startServer() {
         
         try {
+
+            //default room
+            rooms.put("general", new ArrayList<>());
             
             ServerSocket serverSocket = new ServerSocket(Constants.PORT);
             System.out.println("Server is listening on port: " + Constants.PORT);
