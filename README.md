@@ -1,4 +1,3 @@
-```md
 # Java Multiplayer Chat Application
 
 A terminal-based real-time multiplayer chat application built using Java sockets and multithreading.
@@ -45,25 +44,25 @@ The project was built incrementally to learn networking, concurrency, protocol d
 
 ## Compile
 
-\`\`\`bash
+```bash
 javac -d out src/server/_.java src/client/_.java src/common/_.java src/_.java
-\`\`\`
+```
 
 ---
 
 ## Run Server
 
-\`\`\`bash
+```bash
 java -cp out Main
-\`\`\`
+```
 
 ---
 
 ## Run Client
 
-\`\`\`bash
+```bash
 java -cp out ClientMain
-\`\`\`
+```
 
 Open multiple client terminals to test multiplayer communication.
 
@@ -105,7 +104,6 @@ Potential future upgrades include:
 
 Detailed technical documentation is available in:
 
-\`\`\`text
+```text
 docs/project-documentation.md
-\`\`\`
 ```
