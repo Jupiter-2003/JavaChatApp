@@ -52,7 +52,7 @@ public class ChatClient {
 
                 writer.println(userInput);
 
-                if(userInput.equalsIgnoreCase("exit")){ //exit condition
+                if(userInput.equalsIgnoreCase("/exit")){ //exit condition
 
                     socket.close();
                     break;
