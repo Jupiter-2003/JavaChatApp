@@ -7,7 +7,6 @@ A multithreaded chat application built using Java sockets.
 - TCP client-server communication
 - Multiple clients
 - Chat rooms
-- GUI client
 - Commands
 
 ## Tech Stack
@@ -15,4 +14,3 @@ A multithreaded chat application built using Java sockets.
 - Java
 - TCP Sockets
 - Multithreading
-- Swing
