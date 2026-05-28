@@ -25,7 +25,7 @@ public class ChatServer {
                 ClientHandler clientHandler = new ClientHandler(socket);
                 clients.add(clientHandler);
 
-                clientHandler.start();
+                clientHandler.start(); //creates new thread
             }
             
         } catch (Exception e) {

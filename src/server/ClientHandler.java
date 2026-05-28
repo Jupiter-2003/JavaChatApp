@@ -5,11 +5,13 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class ClientHandler extends Thread{
+public class ClientHandler extends Thread{ //every client runs its own thread
     
     private Socket socket;
     private BufferedReader reader;
     private PrintWriter writer;
+
+    private String username;
 
     public ClientHandler(Socket socket){
 
@@ -20,26 +22,41 @@ public class ClientHandler extends Thread{
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); //to read msg from client
             writer = new PrintWriter(socket.getOutputStream(), true); //to send message to client
 
+            //asking username
+            writer.println("Enter your username: ");
+
+            //receiving username
+            username = reader.readLine();
+
+            System.out.println(username + " connected.");
+
+            //notifying everyone
+            broadcastMessage("SYSTEM: "+username+" joined the chat!");
+
         } catch (Exception e) {
             e.printStackTrace();;
         }
     }
 
     @Override
-    public void run() {
-
+    public void run() { //executes when clientHandler.start() is called
+        //code executed by thread
         String message;
 
         try {
             
             while((message = reader.readLine()) != null){
-                System.out.println("Client says: " + message);
-
-                broadcastMessage(message);
 
                 if(message.equalsIgnoreCase("exit")){
+
+                    ChatServer.clients.remove(this);
+                    broadcastMessage("SYSTEM: "+username+" has left the chat.");
+                    socket.close();
                     break;
                 }
+
+                System.out.println(username + ": " + message);
+                broadcastMessage(username + ": " + message);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,7 +67,8 @@ public class ClientHandler extends Thread{
     public void broadcastMessage(String message){
 
         for(ClientHandler client : ChatServer.clients) {
-            client.writer.println(message);
+            if(client != this)
+                client.writer.println(message);
         }
     }
 }

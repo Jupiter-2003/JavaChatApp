@@ -19,6 +19,13 @@ public class ChatClient {
             BufferedReader serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream())); //to read msg from server
             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true); //to send message to server
 
+            //to receive username prompt
+            System.out.println(serverReader.readLine());
+
+            //to send username
+            String username = consoleReader.readLine();
+            writer.println(username);
+
             //thread to receive messages
             Thread receiveThread = new Thread(() -> {
                 try {
@@ -46,6 +53,8 @@ public class ChatClient {
                 writer.println(userInput);
 
                 if(userInput.equalsIgnoreCase("exit")){ //exit condition
+
+                    socket.close();
                     break;
                 }
             }
