@@ -1,4 +1,3 @@
-```md
 # Java Multiplayer Chat Application — Technical Documentation
 
 # Overview
@@ -23,7 +22,7 @@ The project was developed incrementally in phases to learn networking, concurren
 
 The project follows a client-server architecture.
 
-\`\`\`text
+```text
 Clients
 ↓
 TCP Socket Connection
@@ -33,7 +32,7 @@ Server
 Message Routing
 ↓
 Rooms / Commands / Private Messages
-\`\`\`
+```
 
 The server acts as the central communication hub.
 
@@ -74,17 +73,17 @@ TCP sockets provide reliable two-way communication.
 
 ## Server Side
 
-\`\`\`java
+```java
 ServerSocket serverSocket =
 new ServerSocket(Constants.PORT);
-\`\`\`
+```
 
 ## Client Side
 
-\`\`\`java
+```java
 Socket socket =
 new Socket("localhost", Constants.PORT);
-\`\`\`
+```
 
 ---
 
@@ -92,9 +91,9 @@ new Socket("localhost", Constants.PORT);
 
 Methods such as:
 
-\`\`\`java
+```java
 reader.readLine()
-\`\`\`
+```
 
 pause execution until data becomes available.
 
@@ -106,9 +105,9 @@ This is called blocking I/O.
 
 Each connected client gets its own thread.
 
-\`\`\`java
+```java
 public class ClientHandler extends Thread
-\`\`\`
+```
 
 This allows multiple users to communicate simultaneously.
 
@@ -123,9 +122,9 @@ The server maintains shared collections of:
 
 Example:
 
-\`\`\`java
+```java
 public static ArrayList<ClientHandler> clients
-\`\`\`
+```
 
 ---
 
@@ -133,9 +132,9 @@ public static ArrayList<ClientHandler> clients
 
 Messages are broadcast only to users inside the same room.
 
-\`\`\`java
+```java
 for (ClientHandler client : roomClients)
-\`\`\`
+```
 
 This is called scoped broadcasting.
 
@@ -147,12 +146,12 @@ Messages beginning with \`/\` are interpreted as commands.
 
 Examples:
 
-\`\`\`text
+```text
 /help
 /list
 /join music
 /whisper username hello
-\`\`\`
+```
 
 ---
 
@@ -160,16 +159,16 @@ Examples:
 
 Rooms are dynamically managed using:
 
-\`\`\`java
+```java
 HashMap<String,
 ArrayList<ClientHandler>>
-\`\`\`
+```
 
 This maps:
 
-\`\`\`text
+```text
 room name → users in room
-\`\`\`
+```
 
 ---
 
@@ -177,49 +176,49 @@ room name → users in room
 
 ## Client Connection Flow
 
-\`\`\`text
+```text
 Client starts
 → Connects to server
 → Server accepts connection
 → ClientHandler thread created
 → Username requested
 → User joins default room
-\`\`\`
+```
 
 ---
 
 ## Public Messaging Flow
 
-\`\`\`text
+```text
 User types message
 → Client sends message
 → Server receives message
 → Server routes message to room
 → Room users receive message
-\`\`\`
+```
 
 ---
 
 ## Private Messaging Flow
 
-\`\`\`text
+```text
 /whisper username message
 → Server parses command
 → Server locates target user
 → Private message delivered
-\`\`\`
+```
 
 ---
 
 ## Room Join Flow
 
-\`\`\`text
+```text
 /join music
 → User removed from current room
 → Room created if absent
 → User added to new room
 → Room join notification broadcast
-\`\`\`
+```
 
 ---
 
@@ -272,9 +271,9 @@ Stores global constants.
 
 Example:
 
-\`\`\`java
+```java
 public static final int PORT = 5000;
-\`\`\`
+```
 
 ---
 
@@ -295,16 +294,16 @@ Used for room management.
 
 Example:
 
-\`\`\`java
+```java
 HashMap<String,
 ArrayList<ClientHandler>>
-\`\`\`
+```
 
 Purpose:
 
-\`\`\`text
+```text
 room name → room users
-\`\`\`
+```
 
 ---
 
@@ -401,4 +400,3 @@ The project demonstrates strong intermediate-level software engineering concepts
 - multiplayer systems
 - real-time applications
 - communication platforms
-```
